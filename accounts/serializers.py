@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login as django_login
 
 class RegisterSerializer(serializers.Serializer):
 	username = serializers.CharField(max_length=150)
@@ -32,5 +34,13 @@ class LoginSerializer(serializers.Serializer):
 		if not user:
 			raise serializers.ValidationError("Username Not Found")
 		return data 
+
+	def create_token(self, data, request):
+		user = authenticate(username=data.get("username"), password=data.get("password"))
+		django_login(request, user=user)
+		token = Token.objects.filter(user=user).first()
+		if not token:
+			token = Token.objects.create(user = user)
+		return {"token":str(token)}
 
 	
