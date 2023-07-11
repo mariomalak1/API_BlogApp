@@ -4,4 +4,4 @@ from .models import Blog
 class BlogSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Blog
-		exclude = ["create_at", "update_at", "id"]
+		exclude = ["created_at", "updated_at", "id"]

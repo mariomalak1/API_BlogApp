@@ -133,3 +133,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication"
     ],
 }
+
+MEDIA_ROOT = str(BASE_DIR) + '/media/'
+
+MEDIA_URL = '/media/'
