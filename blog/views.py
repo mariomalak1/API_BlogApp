@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -61,21 +62,17 @@ class BlogView(APIView):
 @api_view(["GET", "PATCH", "DELETE"])
 def blog_detials(request):
 	data = request.data
-	print(data)
 	token = Token.objects.filter(key=data.get("token", "")).first()
-	
-	# send user to data dict, to make serializer make it's validation
-	data["user"] = token.user.id
 	
 	blog_id = data.get("blog_id", 0)
 	blog_ = get_object_or_404(Blog, id=blog_id)
 
-
 	if token:
-		if blog_.user != token.user:
+		if blog_.user.username == token.user.username:
 			if request.method == "PATCH":
 				serializer = BlogSerializer(data=data, instance=blog_)
 				if serializer.is_valid():
+					blog_.updated_at = datetime.datetime.now()
 					serializer.save()
 					return Response(serializer.data, status=status.HTTP_201_CREATED)
 				else:
