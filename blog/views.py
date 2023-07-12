@@ -29,14 +29,16 @@ class BlogView(APIView):
 		token = Token.objects.filter(key=data.get("token", "")).first()
 		if token:
 			# send user to data dict, to make serializer make it's validation
-			data["user"] = token.user.id
+			mutable_data = request.data.copy()
+			mutable_data["user"] = token.user.id
+			data = mutable_data
 			serializer = BlogSerializer(data=data)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-		return Response(status=status.HTTP_404_NOT_FOUND)
+		return Response(status=status.HTTP_403_FORBIDDEN)
 
 	def get(self, request):
 		
@@ -70,11 +72,12 @@ def blog_detials(request):
 	if token:
 		if blog_.user.username == token.user.username:
 			if request.method == "PATCH":
-				serializer = BlogSerializer(data=data, instance=blog_)
+				serializer = BlogSerializer(data=data, instance=blog_, partial=True)
+				# updated_data = serializer.partial_update(request)
 				if serializer.is_valid():
 					blog_.updated_at = datetime.datetime.now()
 					serializer.save()
-					return Response(serializer.data, status=status.HTTP_201_CREATED)
+					return Response(serializer.data, status=status.HTTP_200_OK)
 				else:
 					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 			elif request.method == "GET":
