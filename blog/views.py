@@ -55,11 +55,12 @@ class BlogView(APIView):
 		# this function that take the request and return the valid page number
 		page_number = valid_page_num_for_pagination(request, blog_paginator.num_pages)
 		
-		serializer = BlogSerializer(data=blog_paginator.page(page_number).object_list, many=True)
-		if serializer.is_valid():
-			serializer.data["number_of_pages"] = blog_paginator.num_pages
-		
-		return Response(serializer.data, status=status.HTTP_200_OK)
+		serializer = BlogSerializer(blog_paginator.page(page_number).object_list, many=True) 
+		all_data = {
+			"data": serializer.data,
+			"number_of_pages": blog_paginator.num_pages,
+		}
+		return Response(all_data , status=status.HTTP_200_OK)
 
 @api_view(["GET", "PATCH", "DELETE"])
 def blog_detials(request):
@@ -113,3 +114,23 @@ class Blog_Detials(APIView):
         blog = get_object_or_404(Blog, id=pk)
         blog.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(["GET"])
+def user_blogs(request):
+	if request.method == "GET":
+		number_of_objects_per_page = request.GET.get("n_objects", 2) 
+		token = Token.objects.filter(key=request.data.get("token", "")).first()
+		if token:
+			blogs = Blog.objects.filter(user__username=token.user.username)
+			blog_paginator = Paginator(blogs, number_of_objects_per_page)
+
+			page_number = valid_page_num_for_pagination(request, blog_paginator.num_pages)
+
+			serializer = BlogSerializer(blog_paginator.page(page_number).object_list, many=True)
+			
+			all_data = {
+				"data": serializer.data,
+				"number_of_pages": blog_paginator.num_pages,
+			}
+			return Response(all_data, status=status.HTTP_201_CREATED)
+		return Response(status=status.HTTP_403_FORBIDDEN)
