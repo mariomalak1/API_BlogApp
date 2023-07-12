@@ -102,7 +102,7 @@ class Blog_Detials(APIView):
 
     def patch(self, request, pk):
         blog = get_object_or_404(Blog, id=pk)
-        serializer = BlogSerializer(blog, data=request.data)
+        serializer = BlogSerializer(blog, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
