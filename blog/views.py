@@ -79,14 +79,16 @@ def blog_detials(request):
 					serializer.save()
 					return Response(serializer.data, status=status.HTTP_200_OK)
 				else:
-					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-			elif request.method == "GET":
-				serializer = BlogSerializer(instance=blog_)
-				return Response(serializer.data, status=status.HTTP_200_OK)			
+					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)		
 
 			elif request.method == "DELETE":
 				blog_.delete()
 				return Response(status=status.HTTP_204_NO_CONTENT)
+
+		# any user with token can see the another blog or his blog 
+		if request.method == "GET":
+			serializer = BlogSerializer(instance=blog_)
+			return Response(serializer.data, status=status.HTTP_200_OK)	
 
 	return Response(status=status.HTTP_403_FORBIDDEN)
 
