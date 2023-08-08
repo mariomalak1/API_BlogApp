@@ -37,10 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "rest_framework",
     "rest_framework.authtoken",
-
     "accounts",
     "blog",
 ]
@@ -129,11 +127,11 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication"
     ],
 }
 
-MEDIA_ROOT = str(BASE_DIR) + '/media/'
+MEDIA_ROOT = str(BASE_DIR) + "/media/"
 
-MEDIA_URL = '/media/'
+MEDIA_URL = "/media/"
